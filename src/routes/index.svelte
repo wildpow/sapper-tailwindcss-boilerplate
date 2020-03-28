@@ -29,6 +29,7 @@
   }
 
   p {
+    @apply text-red-500;
     margin: 1em auto;
   }
 
@@ -45,7 +46,7 @@
 
 <h1>Great success!</h1>
 
-<figure class="flex bg-gray-400">
+<figure class="">
   <img alt="Borat" src="great-success.png" />
   <figcaption>HIGH FIVE!</figcaption>
 </figure>

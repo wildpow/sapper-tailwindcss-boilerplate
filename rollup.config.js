@@ -12,16 +12,33 @@ const mode = process.env.NODE_ENV;
 const dev = mode === "development";
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 const tailwind = require("./tailwind.config.js");
+const cssnano = require("cssnano")({
+  preset: "default"
+});
 const purgecss = require("@fullhuman/postcss-purgecss")({
   // Specify the paths to all of the template files in your project
   content: ["./src/**/*.html", "./src/**/*.svelte"],
   // Include any special characters you're using in this regular expression
-  defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || []
+  extractors: [
+    {
+      extractor: content => content.match(/[A-Za-z0-9-_:/]+/g) || [],
+
+      // Specify the file extensions to include when scanning for
+      // class names.
+      extensions: ["svelte"]
+    }
+  ],
+  // Whitelist selectors to stop Purgecss from removing them from your CSS.
+  whitelist: ["html", "body"]
 });
+
 const preprocessDev = sveltePreprocess({
   postcss: {
     plugins: [
       require("tailwindcss")(tailwind),
+      require("postcss-import")(),
+      require("postcss-url")(),
+      require("autoprefixer"),
       require("postcss-preset-env")({
         /* use stage 3 features + css nesting rules */
         stage: 3,
@@ -36,8 +53,12 @@ const preprocessProd = sveltePreprocess({
   postcss: {
     plugins: [
       require("tailwindcss")(tailwind),
+      require("postcss-import")(),
+      require("postcss-url")(),
+      require("autoprefixer"),
       require("postcss-preset-env"),
-      purgecss
+      purgecss,
+      cssnano
     ]
   }
 });
